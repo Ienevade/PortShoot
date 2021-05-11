@@ -9,9 +9,10 @@
 #include "Particles/Size/ParticleModuleSizeBase.h"
 #include "Components/PSCharacterMovementComponent.h"
 #include "Components/PSHealthComponent.h"
+#include "Components/PSWeaponComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "GameFramework/Controller.h"
-#include "Weapon/PSBaseWeapon.h"
+
 DEFINE_LOG_CATEGORY_STATIC(BaseCharLog, All, All);
 
 // Sets default values
@@ -34,6 +35,8 @@ APSBaseCharacter::APSBaseCharacter(const FObjectInitializer& ObjInit):Super(ObjI
     HealthTextComponent=CreateDefaultSubobject<UTextRenderComponent>("HealthRenderComponent");
     HealthTextComponent->SetupAttachment(GetRootComponent());
     HealthTextComponent->SetOwnerNoSee(true);
+
+    WeaponComponent = CreateDefaultSubobject<UPSWeaponComponent>("WeaponComponent");
     
 }
 
@@ -51,7 +54,7 @@ void APSBaseCharacter::BeginPlay()
 
     LandedDelegate.AddDynamic(this, &APSBaseCharacter::OnGroundLanded);
 
-    SpawnWeapon();
+    
 }
 
 // Called every frame
@@ -69,6 +72,7 @@ void APSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
     check(PlayerInputComponent);
+    check(WeaponComponent);
     PlayerInputComponent->BindAxis("MoveForward", this, &APSBaseCharacter::MoveForward);
     PlayerInputComponent->BindAxis("MoveRight", this, &APSBaseCharacter::MoveRight);
     PlayerInputComponent->BindAxis("LookUp", this, &APSBaseCharacter::AddControllerPitchInput);
@@ -76,6 +80,7 @@ void APSBaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
     PlayerInputComponent->BindAction("Jump",IE_Pressed, this, &APSBaseCharacter::Jump);
     PlayerInputComponent->BindAction("Run",IE_Pressed, this, &APSBaseCharacter::OnStartRunning);
     PlayerInputComponent->BindAction("Run",IE_Released, this, &APSBaseCharacter::OnStopRunning);
+    PlayerInputComponent->BindAction("Fire", IE_Pressed, WeaponComponent, &UPSWeaponComponent::Fire);
 }
 
 bool APSBaseCharacter::IsRunning() const
@@ -152,14 +157,4 @@ void APSBaseCharacter::OnGroundLanded(const FHitResult& Hit)
     TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
 
-void APSBaseCharacter::SpawnWeapon()
-{
-    if (!GetWorld()) return;
-    const auto Weapon = GetWorld()->SpawnActor<APSBaseWeapon>(WeaponClass);
-    if (Weapon)
-    {
-        FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget,false) ;
-        Weapon->AttachToComponent(GetMesh(),AttachmentRules, "WeaponSocket");
-    }
-}
 

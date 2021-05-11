@@ -17,12 +17,21 @@ class PORTSHOOT_API APSBaseWeapon : public AActor
 public:	
 	
 	APSBaseWeapon();
+    virtual void Fire();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+    FName MuzzleSocketName = "MuzzleSocket";
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+    float TraceMaxDistance = 1500.0f;
+
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
     USkeletalMeshComponent* WeaponMesh;
 	virtual void BeginPlay() override;
 
 
+    void MakeShot();
 
 };
