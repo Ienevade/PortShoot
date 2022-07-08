@@ -3,13 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "PSBaseWeapon.h"
-#include "PSHealthComponent.h"
-#include "Camera/CameraComponent.h"
-#include "Components/TextRenderComponent.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
 
 #include "PSBaseCharacter.generated.h"
 
